@@ -1,7 +1,7 @@
 #include "naves.h"
+#include <cstring>
 
 Naves::Naves() {
-    enum Naves{
+    strcpy(nombre, "Sin nombre");
 
-    };
 }
