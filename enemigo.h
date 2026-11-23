@@ -5,6 +5,7 @@ class Enemigo
 {
 public:
     Enemigo();
+    void caminar();
 };
 
 #endif // ENEMIGO_H
