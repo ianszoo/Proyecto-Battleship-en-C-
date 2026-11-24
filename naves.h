@@ -17,8 +17,8 @@ public:
     void colocar(int fila, int col, bool horizontal);
     void rotar();
     void recibirImpacto();
-    void estaHundida() const;
-    void estaColocada() const;
+    bool estaHundida() const;
+    bool estaColocada() const;
     void reiniciar();
     int getTamano() const;
     int getImpactos() const;

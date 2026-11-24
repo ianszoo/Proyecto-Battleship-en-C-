@@ -3,7 +3,7 @@
 
 #include <string>
 #include "tablero.h"
-#include "Naves.h"
+#include "naves.h"
 
 using namespace std;
 
@@ -61,5 +61,6 @@ public:
     bool tieneAtaqueEspecial() const;
 
 };
+
 
 #endif // JUGADOR_H

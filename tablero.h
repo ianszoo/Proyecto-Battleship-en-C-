@@ -1,6 +1,6 @@
 #ifndef TABLERO_H
 #define TABLERO_H
-#include "Naves.h"
+#include "naves.h"
 
 struct Casilla {
     //estado determina con ~ si es agua, B para un barco, X si hay un impacto con una nave, O si la agua es disparada
