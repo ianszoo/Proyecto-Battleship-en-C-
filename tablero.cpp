@@ -7,14 +7,11 @@ Tablero::Tablero(int n, int maxNaves) {
     this->maxNaves=maxNaves;
     cantidadNaves=0;
 
-    //creacion de las casillas
     celdas=new Casilla*[n];
     for(int i=0; i<n; i++){
         celdas[i]=new Casilla[n];
     }
 
-    //creacion de las naves, empieza con nullptr ya que
-    //por el momento no se establece ninguna nave en el tablero
     flota=new Naves*[maxNaves];
     for(int i=0; i<maxNaves; i++){
         flota[i]=nullptr;
@@ -36,8 +33,6 @@ Tablero::~Tablero() {
     flota=nullptr;
 }
 
-//inicializar las casillas con solo agua,
-//id de barcos en -1 para decir que no hay y que no hay mina en el caso de que el nivel no sea o que no haya ninguna mina
 
 void Tablero::inicializar(){
     for (int i = 0; i < n; i++) {
@@ -77,7 +72,6 @@ bool Tablero::casillaHundida(int fila, int col) const{
     return(*(flota+id))->estaHundida();
 }
 
-//revisar las siguientes por cualquier error:
 
 bool Tablero::agregarNave(Naves* nave){
     if(nave==nullptr || cantidadNaves>=maxNaves){
@@ -90,13 +84,11 @@ bool Tablero::agregarNave(Naves* nave){
 
 
 bool Tablero::validarNave(int fila, int col, int tam, bool horizontal) const{
-    //casilla inicial debe estar dentro del tablero
 
     if(!coordenadaValida(fila,col)){
         return false;
     }
 
-    //ultima casilla debe estar tambien
 
     int filaFinal=horizontal ? fila:fila+tam -1;
     int colFinal=horizontal ? col+tam-1: col;
@@ -105,7 +97,6 @@ bool Tablero::validarNave(int fila, int col, int tam, bool horizontal) const{
         return false;
     }
 
-    //asegurar que ninguna casilla del recorrido del barco tenga ya un barco
     for(int i=0; i<tam; i++){
         int f=horizontal ? fila: fila+i;
         int c=horizontal ? col+i:col;
@@ -147,12 +138,10 @@ int Tablero::disparar(int fila, int col){
 
     Casilla* casilla = *(celdas + fila) + col;
 
-    //si ya fue disparada antes, es invalido
     if(casilla->estado == 'X' || casilla->estado == 'O'){
         return -1;
     }
 
-    //disparo al agua
     if(casilla->estado == '~'){
         casilla->estado = 'O';
         // en el caso de q hay una mina
