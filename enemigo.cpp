@@ -1,9 +1,6 @@
 #include "enemigo.h"
 #include <QRandomGenerator>
 
-// =========================================================================
-// IMPLEMENTACIÓN DE PILA DINÁMICA PROPIA
-// =========================================================================
 PilaCoordenadas::PilaCoordenadas() : tope(nullptr) {}
 
 PilaCoordenadas::~PilaCoordenadas() {
@@ -36,9 +33,6 @@ void PilaCoordenadas::limpiar() {
     while (pop(aux)) {}
 }
 
-// =========================================================================
-// IMPLEMENTACIÓN DE ENEMIGO (QThread + IA DE 3 NIVELES)
-// =========================================================================
 Enemigo::Enemigo(QObject* parent)
     : QThread(parent),
     nivel(1),
@@ -63,7 +57,6 @@ void Enemigo::reservarMemoria(int tam, int cantBarcos) {
     n = tam;
     cantidadBarcosNivel = cantBarcos;
 
-    // 1. Matrices dinámicas con punteros dobles
     registroRadar = new int*[n];
     mapaProbabilidad = new int*[n];
     for (int i = 0; i < n; ++i) {
@@ -75,7 +68,6 @@ void Enemigo::reservarMemoria(int tam, int cantBarcos) {
         }
     }
 
-    // 2. Arreglos dinámicos para rastrear tamaños de barcos vivos
     tamaniosBarcos = new int[cantidadBarcosNivel];
     barcosVivos = new bool[cantidadBarcosNivel];
     for (int i = 0; i < cantidadBarcosNivel; ++i) {
@@ -136,7 +128,6 @@ void Enemigo::configurarNivel(int nuevoNivel, Tablero* tableroJugador) {
     int cant = 3;
 
     if (nivel == 1) {
-        // Nivel 1: Patrulla Costera (8x8, 3 barcos: 3, 3, 2)
         tam = (tableroJugador != nullptr) ? tableroJugador->getN() : 8;
         cant = 3;
         reservarMemoria(tam, cant);
@@ -144,7 +135,6 @@ void Enemigo::configurarNivel(int nuevoNivel, Tablero* tableroJugador) {
         *(tamaniosBarcos + 1) = 3;
         *(tamaniosBarcos + 2) = 2;
     } else if (nivel == 2) {
-        // Nivel 2: Escuadra Táctica (10x10, 5 barcos: 5, 4, 3, 3, 2)
         tam = (tableroJugador != nullptr) ? tableroJugador->getN() : 10;
         cant = 5;
         reservarMemoria(tam, cant);
@@ -154,7 +144,6 @@ void Enemigo::configurarNivel(int nuevoNivel, Tablero* tableroJugador) {
         *(tamaniosBarcos + 3) = 3;
         *(tamaniosBarcos + 4) = 2;
     } else {
-        // Nivel 3: Guerra Total (14x14, 7 barcos: 5, 4, 3, 3, 3, 2, 2)
         tam = (tableroJugador != nullptr) ? tableroJugador->getN() : 14;
         cant = 7;
         reservarMemoria(tam, cant);
@@ -196,7 +185,6 @@ bool Enemigo::coordenadaValida(int fila, int col) const {
 }
 
 void Enemigo::apilarVecinosCardinales(int fila, int col) {
-    // 4 ejes cardinales: Arriba, Abajo, Izquierda, Derecha
     const int df[4] = {-1, 1, 0, 0};
     const int dc[4] = {0, 0, -1, 1};
 
@@ -255,7 +243,6 @@ int Enemigo::contarConectadosRecursivo(int fila, int col, bool** visitados) {
 void Enemigo::marcarBarcoHundidoEnRadar(int fila, int col) {
     int tamHundido = 0;
 
-    // 1. Aprovechamos Tablero::casillaHundida(i, j) si está conectado
     if (tableroObjetivo != nullptr) {
         for (int i = 0; i < n; ++i) {
             for (int j = 0; j < n; ++j) {
@@ -267,7 +254,6 @@ void Enemigo::marcarBarcoHundidoEnRadar(int fila, int col) {
         }
     }
 
-    // 2. Respaldo recursivo por si tableroObjetivo es nullptr
     if (tamHundido == 0) {
         bool** visitados = new bool*[n];
         for (int i = 0; i < n; ++i) {
@@ -287,7 +273,6 @@ void Enemigo::marcarBarcoHundidoEnRadar(int fila, int col) {
         visitados = nullptr;
     }
 
-    // 3. Dar de baja ese barco en la lista de barcos vivos (para Nivel 3)
     for (int i = 0; i < cantidadBarcosNivel; ++i) {
         if (*(barcosVivos + i) && *(tamaniosBarcos + i) == tamHundido) {
             *(barcosVivos + i) = false;
@@ -312,11 +297,9 @@ void Enemigo::registrarResultadoDisparo(int fila, int col, int resultado) {
     }
 
     if (resultado == 0) {
-        // 0 = Agua
         *(*(registroRadar + fila) + col) = 1;
     }
     else if (resultado == 1) {
-        // 1 = Impacto
         *(*(registroRadar + fila) + col) = 2;
         if (nivel >= 2) {
             estadoActual = EstadoIA::DESTRUCCION;
@@ -324,7 +307,6 @@ void Enemigo::registrarResultadoDisparo(int fila, int col, int resultado) {
         }
     }
     else if (resultado == 2) {
-        // 2 = Hundido
         *(*(registroRadar + fila) + col) = 2;
         marcarBarcoHundidoEnRadar(fila, col);
 
@@ -364,9 +346,6 @@ Coordenada Enemigo::calcularDisparoNivel1() {
     return elegida;
 }
 
-// =========================================================================
-// NIVEL 2: Escuadra Táctica (10x10) -> Caza + Destrucción (4 ejes cardinales)
-// =========================================================================
 Coordenada Enemigo::calcularDisparoNivel2() {
     if (estadoActual == EstadoIA::DESTRUCCION) {
         Coordenada objetivo;
@@ -382,15 +361,11 @@ Coordenada Enemigo::calcularDisparoNivel2() {
     return calcularDisparoNivel1();
 }
 
-// =========================================================================
-// NIVEL 3: Guerra Total (14x14) -> Mapa de Probabilidad + Paridad
-// =========================================================================
 Coordenada Enemigo::calcularDisparoNivel3() {
     if (mapaProbabilidad == nullptr || registroRadar == nullptr) {
         return {-1, -1};
     }
 
-    // 1. Limpiar mapa de probabilidad
     for (int i = 0; i < n; ++i) {
         for (int j = 0; j < n; ++j) {
             *(*(mapaProbabilidad + i) + j) = 0;
@@ -399,14 +374,12 @@ Coordenada Enemigo::calcularDisparoNivel3() {
 
     bool modoImpactoActivo = hayImpactosPendientes();
 
-    // 2. Simular todas las posiciones válidas para cada barco vivo del jugador
     for (int b = 0; b < cantidadBarcosNivel; ++b) {
         if (!*(barcosVivos + b)) {
             continue;
         }
         int tamBarco = *(tamaniosBarcos + b);
 
-        // Barrido HORIZONTAL
         for (int f = 0; f < n; ++f) {
             for (int c = 0; c <= n - tamBarco; ++c) {
                 bool valido = true;
@@ -437,7 +410,6 @@ Coordenada Enemigo::calcularDisparoNivel3() {
             }
         }
 
-        // Barrido VERTICAL
         for (int f = 0; f <= n - tamBarco; ++f) {
             for (int c = 0; c < n; ++c) {
                 bool valido = true;
@@ -499,7 +471,6 @@ Coordenada Enemigo::calcularDisparoNivel3() {
         }
     }
 
-    // 4. Desempate aleatorio entre las celdas con mayor probabilidad
     if (maxProb > 0) {
         Coordenada* mejores = new Coordenada[n * n];
         int cantMejores = 0;
@@ -533,7 +504,6 @@ Coordenada Enemigo::calcularDisparoNivel3() {
         }
     }
 
-    // Respaldo seguro
     return calcularDisparoNivel2();
 }
 

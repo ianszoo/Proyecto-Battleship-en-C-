@@ -11,9 +11,9 @@ Naves::Naves() {
 }
 
 Naves::Naves(const char* nombre, int tamano) {
-    if (nombre != nullptr) {
+    if (nombre != nullptr){
         std::strncpy(this->nombre, nombre, 19);
-        this->nombre[19] = '\0';
+        this->nombre[19]='\0';
     } else {
         std::strcpy(this->nombre, "Sin nombre");
     }
@@ -25,7 +25,7 @@ Naves::Naves(const char* nombre, int tamano) {
 }
 
 Naves::~Naves() {
-    // No reserva memoria dinámica interna
+
 }
 
 void Naves::colocar(int fila, int col, bool horizontal) {
@@ -59,26 +59,26 @@ void Naves::reiniciar() {
     horizontal = true;
 }
 
-int Naves::getTamano() const {
+int Naves::getTamano() const{
     return tamano;
 }
 
-int Naves::getImpactos() const {
+int Naves::getImpactos() const{
     return impactos;
 }
 
-int Naves::getFila() const {
+int Naves::getFila() const{
     return fila;
 }
 
-int Naves::getCol() const {
+int Naves::getCol() const{
     return col;
 }
 
-bool Naves::esHorizontal() const {
+bool Naves::esHorizontal() const{
     return horizontal;
 }
 
-const char* Naves::getNombre() const {
+const char* Naves::getNombre() const{
     return nombre;
 }
