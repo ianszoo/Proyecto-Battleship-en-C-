@@ -1,9 +1,11 @@
-#include <QCoreApplication>
-#include <QEventLoop>
-#include <QObject>
+#include <QApplication>
+#include "ventanajuego.h"
 
+int main(int argc, char* argv[]) {
+    QApplication app(argc, argv);
 
-using namespace std;
-int main(){
-    return 0;
+    VentanaJuego ventana;
+    ventana.show();
+
+    return app.exec();
 }

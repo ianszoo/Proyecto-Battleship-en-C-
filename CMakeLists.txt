@@ -15,12 +15,15 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets)
 
 add_executable(Battleship
     main.cpp
+    recursos.qrc
     enemigo.h enemigo.cpp
     historial.h historial.cpp
     jugador.h jugador.cpp
     naves.h naves.cpp
     nivel.h nivel.cpp
     tablero.h tablero.cpp
+    escenatablero.h escenatablero.cpp
+    ventanajuego.h ventanajuego.cpp
 )
 
 target_link_libraries(Battleship PRIVATE
