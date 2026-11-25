@@ -24,6 +24,7 @@ add_executable(Battleship
     tablero.h tablero.cpp
     escenatablero.h escenatablero.cpp
     ventanajuego.h ventanajuego.cpp
+    ranking.h ranking.cpp
 )
 
 target_link_libraries(Battleship PRIVATE

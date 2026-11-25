@@ -3,8 +3,12 @@
 
 class Historial
 {
+private:
+
 public:
     Historial();
+    ~Historial();
+
 };
 
 #endif // HISTORIAL_H
