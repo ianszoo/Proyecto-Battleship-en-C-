@@ -6,33 +6,24 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QTimer>
-#include "tablero.h"
+#include "jugador.h"
 #include "enemigo.h"
 #include "escenatablero.h"
 
-class VentanaJuego : public QMainWindow {
+class VentanaJuego : public QMainWindow{
     Q_OBJECT
 
 private:
-    Tablero* tableroJugador;
+    Jugador* jugador;
     Tablero* tableroEnemigo;
     Enemigo* enemigoIA;
 
-    // Arreglo dinámico propio de naves del jugador (sin QList/vector)
-    Naves** navesJugador;
-    int totalNaves;
-    int indiceNaveActual;
-    bool orientacionHorizontal;
     bool faseCombate;
     bool turnoJugador;
 
-    // Temporizador por turno
     QTimer* timerTurno;
     int segundosRestantes;
-    int disparosRealizados;
-    int disparosAcertados;
 
-    // Componentes visuales
     EscenaTablero* escenaJugador;
     EscenaTablero* escenaEnemigo;
     QGraphicsView* vistaJugador;
@@ -45,8 +36,8 @@ private:
     QPushButton* btnAleatorio;
 
     void iniciarNivel(int nivel);
-    void liberarNaves();
     void comenzarCombate();
+    void iniciarTurnoEnemigo(const QString& mensaje);
     void actualizarEtiquetas();
 
 private slots:
@@ -58,8 +49,8 @@ private slots:
     void procesarDisparoIA(int fila, int col);
 
 public:
-    explicit VentanaJuego(QWidget* parent = nullptr);
+    explicit VentanaJuego(QWidget* parent=nullptr);
     ~VentanaJuego() override;
 };
 
-#endif // VENTANAJUEGO_H
+#endif

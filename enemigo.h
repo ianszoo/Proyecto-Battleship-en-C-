@@ -4,19 +4,19 @@
 #include <QThread>
 #include "tablero.h"
 
-struct Coordenada {
+struct Coordenada{
     int fila;
     int col;
 };
 
-struct NodoCoord {
+struct NodoCoord{
     Coordenada dato;
     NodoCoord* siguiente;
 
-    NodoCoord(int f, int c) : dato{f, c}, siguiente(nullptr) {}
+    NodoCoord(int f, int c) : dato{f,c}, siguiente(nullptr){}
 };
 
-class PilaCoordenadas {
+class PilaCoordenadas{
 private:
     NodoCoord* tope;
 
@@ -30,12 +30,12 @@ public:
     void limpiar();
 };
 
-enum class EstadoIA {
+enum class EstadoIA{
     CAZA,
     DESTRUCCION
 };
 
-class Enemigo : public QThread {
+class Enemigo : public QThread{
     Q_OBJECT
 
 private:
@@ -64,6 +64,7 @@ private:
     void marcarBarcoHundidoEnRadar(int fila, int col);
     int contarConectadosRecursivo(int fila, int col, bool** visitados);
     int obtenerMinimoBarcoVivo() const;
+    void evaluarColocaciones(int tamBarco, bool horizontal, bool modoImpactoActivo);
 
     Coordenada calcularDisparoNivel1();
     Coordenada calcularDisparoNivel2();
@@ -73,7 +74,7 @@ protected:
     void run() override;
 
 public:
-    explicit Enemigo(QObject* parent = nullptr);
+    explicit Enemigo(QObject* parent=nullptr);
     ~Enemigo() override;
 
     void configurarNivel(int nuevoNivel, Tablero* tableroJugador);
@@ -89,4 +90,4 @@ signals:
     void disparoCalculado(int fila, int col);
 };
 
-#endif // ENEMIGO_H
+#endif

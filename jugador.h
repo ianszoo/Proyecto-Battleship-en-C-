@@ -25,7 +25,6 @@ private:
     int cargasEspeciales;
 
     void liberarTablero();
-    void crearNavesNivel();
 public:
     Jugador(string nombre="Lider");
     ~Jugador();
@@ -43,6 +42,7 @@ public:
     int usarAtaqueSonar(Tablero* tableroEnemigo, int fila, int col);
     bool perdio() const;
 
+    Naves* getNavePorColocar() const;
     int getNavesActivas() const;
     void setNombre(const string &nombre);
     string getNombre() const;
@@ -59,8 +59,6 @@ public:
     int getRachaHits() const;
     int getCargasEspeciales() const;
     bool tieneAtaqueEspecial() const;
-
 };
 
-
-#endif // JUGADOR_H
+#endif

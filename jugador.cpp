@@ -1,6 +1,6 @@
 #include "jugador.h"
 
-Jugador::Jugador(string nombre) {
+Jugador::Jugador(string nombre){
     this->nombre=nombre.empty() ? "Lider":nombre;
     this->tablero=nullptr;
     this->nivelActual=1;
@@ -10,6 +10,7 @@ Jugador::Jugador(string nombre) {
 
     reiniciarStats();
 }
+
 Jugador::~Jugador(){
     liberarTablero();
 }
@@ -43,56 +44,17 @@ void Jugador::configurarNivel(int nivel){
     rachaAciertos=0;
     cargasEspeciales=0;
 
-    int tamTablero=0;
-    if(nivelActual==1){
-        tamTablero=8;
-        maxNaves=3;
-    }else if(nivelActual==2){
-        tamTablero=10;
-        maxNaves=5;
-    }else if(nivelActual==3){
-        tamTablero=14;
-        maxNaves=7;
-    }
+    int tamTablero=Tablero::tamanoPorNivel(nivelActual);
+    maxNaves=Tablero::maxNavesPorNivel(nivelActual);
 
-    tablero=new Tablero(tamTablero, maxNaves);
-    crearNavesNivel();
-}
-
-void Jugador::crearNavesNivel(){
-    if(tablero==nullptr){
-        return;
-    }
-
-    if (nivelActual==1){
-        tablero->agregarNave(new Naves("Cruiser", 3));
-        tablero->agregarNave(new Naves("Submarino", 3));
-        tablero->agregarNave(new Naves("Destroyer", 2));
-    }
-    else if (nivelActual==2){
-        tablero->agregarNave(new Naves("Carrier", 5));
-        tablero->agregarNave(new Naves("Battleship", 4));
-        tablero->agregarNave(new Naves("Cruiser", 3));
-        tablero->agregarNave(new Naves("Submarino", 3));
-        tablero->agregarNave(new Naves("Destroyer", 2));
-    }
-    else if (nivelActual==3){
-        tablero->agregarNave(new Naves("Carrier", 5));
-        tablero->agregarNave(new Naves("Battleship", 4));
-        tablero->agregarNave(new Naves("Cruiser 1", 3));
-        tablero->agregarNave(new Naves("Cruiser 2", 3));
-        tablero->agregarNave(new Naves("Submarino", 3));
-        tablero->agregarNave(new Naves("Destroyer 1", 2));
-        tablero->agregarNave(new Naves("Destroyer 2", 2));
-    }
-
+    tablero=new Tablero(tamTablero,maxNaves);
+    tablero->cargarFlotaNivel(nivelActual);
 }
 
 bool Jugador::agregarNave(Naves* nave){
-    if (tablero==nullptr || nave==nullptr){
+    if(tablero==nullptr || nave==nullptr){
         return false;
     }
-
     return tablero->agregarNave(nave);
 }
 
@@ -101,7 +63,7 @@ bool Jugador::colocarNave(int fila, int col){
         return false;
     }
 
-    if(tablero->colocarNave(navesColocadas, fila, col, esHorizontal)){
+    if(tablero->colocarNave(navesColocadas,fila,col,esHorizontal)){
         navesColocadas++;
         return true;
     }
@@ -170,7 +132,7 @@ int Jugador::realizarDisparo(Tablero* tableroEnemigo, int fila, int col){
 }
 
 int Jugador::usarAtaqueCruz(Tablero* tableroEnemigo, int fila, int col){
-    if(tableroEnemigo==nullptr || nivelActual !=3 || cargasEspeciales <=0){
+    if(tableroEnemigo==nullptr || nivelActual!=3 || cargasEspeciales<=0){
         return -1;
     }
 
@@ -180,7 +142,7 @@ int Jugador::usarAtaqueCruz(Tablero* tableroEnemigo, int fila, int col){
 
     cargasEspeciales--;
 
-    int df[5]={0,-1,1,0,0,};
+    int df[5]={0,-1,1,0,0};
     int dc[5]={0,0,0,-1,1};
     int impactos=0;
 
@@ -192,7 +154,9 @@ int Jugador::usarAtaqueCruz(Tablero* tableroEnemigo, int fila, int col){
             int res=tableroEnemigo->disparar(nf,nc);
             if(res!=-1){
                 disparosRealizados++;
-                if(res==1 || res==2){
+                if(res==3){
+                    ptj+=25;
+                }else if(res==1 || res==2){
                     disparosHit++;
                     impactos++;
                     ptj+=100;
@@ -208,23 +172,23 @@ int Jugador::usarAtaqueCruz(Tablero* tableroEnemigo, int fila, int col){
 }
 
 int Jugador::usarAtaqueSonar(Tablero* tableroEnemigo, int fila, int col){
-    if (tableroEnemigo==nullptr || nivelActual!=3 || cargasEspeciales<=0){
+    if(tableroEnemigo==nullptr || nivelActual!=3 || cargasEspeciales<=0){
         return -1;
     }
-    if (!tableroEnemigo->coordenadaValida(fila, col)) {
+    if(!tableroEnemigo->coordenadaValida(fila,col)){
         return -1;
     }
 
     cargasEspeciales--;
-    tableroEnemigo->revelarZona3x3(fila, col);
+    tableroEnemigo->revelarZona3x3(fila,col);
 
     int detectados=0;
-    for (int df=-1; df<=1; df++) {
-        for (int dc=-1; dc<=1; dc++) {
+    for(int df=-1; df<=1; df++){
+        for(int dc=-1; dc<=1; dc++){
             int nf=fila+df;
             int nc=col+dc;
-            if (tableroEnemigo->coordenadaValida(nf, nc)) {
-                if (tableroEnemigo->getEstado(nf, nc)=='B') {
+            if(tableroEnemigo->coordenadaValida(nf,nc)){
+                if(tableroEnemigo->getEstado(nf,nc)=='B'){
                     detectados++;
                 }
             }
@@ -235,21 +199,28 @@ int Jugador::usarAtaqueSonar(Tablero* tableroEnemigo, int fila, int col){
 }
 
 bool Jugador::perdio() const{
-    if (tablero==nullptr){
+    if(tablero==nullptr){
         return false;
     }
     return tablero->flotaDestruida();
 }
 
+Naves* Jugador::getNavePorColocar() const{
+    if(tablero==nullptr || flotaCompletada()){
+        return nullptr;
+    }
+    return tablero->getNave(navesColocadas);
+}
+
 int Jugador::getNavesActivas() const{
-    if (tablero==nullptr){
+    if(tablero==nullptr){
         return 0;
     }
     return tablero->navesActivas();
 }
 
 void Jugador::setNombre(const string &nombre){
-    if (!nombre.empty()){
+    if(!nombre.empty()){
         this->nombre=nombre;
     }
 }
@@ -295,7 +266,7 @@ int Jugador::getPuntaje() const{
 }
 
 double Jugador::getPorcentajePunteria() const{
-    if (disparosRealizados==0){
+    if(disparosRealizados==0){
         return 0.0;
     }
     return (disparosHit*100.0)/disparosRealizados;
@@ -312,4 +283,3 @@ int Jugador::getCargasEspeciales() const{
 bool Jugador::tieneAtaqueEspecial() const{
     return (nivelActual==3 && cargasEspeciales>0);
 }
-
